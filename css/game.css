@@ -39,6 +39,12 @@
   font-size: 1.5rem;
 }
 
+.game__win {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
 .game__button-wrapper {
   text-align: center;
   margin: 0.5rem 1rem;
@@ -100,7 +106,7 @@
   right: 0;
 
   height: 100%;
-  max-height: 0;
+  max-height: 10px;
 
   transition: all 0.25s;
   background-color: black;
@@ -112,13 +118,4 @@
 
 .color-list > li:hover {
   background-color: #ddd;
-}
-
-/* ************ */
-/*    FOOTER    */
-/* ************ */
-footer {
-  margin-top: 1rem;
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 14px;
 }
