@@ -7,8 +7,10 @@ import {
   getPlayAgainButton,
 } from './selectors.js'
 import {
+  createTimer,
   getRandomColorPairs,
   hidePlayAgainButton,
+  setBackgroundColor,
   setTimerText,
   showPlayAgainButton,
 } from './utils.js'
@@ -16,6 +18,24 @@ import {
 // Global variables
 let selections = []
 let gameStatus = GAME_STATUS.PLAYING
+
+//handle timer for game play v2 - RECOMMEND - more optimize
+let timer = createTimer({
+  seconds: GAME_TIME,
+  onChange: handleTimerChange,
+  onFinish: handleTimerFinish,
+})
+
+function handleTimerChange(seconds) {
+  const fullSecond = `0${seconds}`.slice(-2)
+  setTimerText(`${fullSecond}s`)
+}
+
+function handleTimerFinish() {
+  setTimerText('Game Over!')
+  gameStatus = GAME_STATUS.FINISHED
+  showPlayAgainButton()
+}
 
 // TODOs
 // 1. Generating colors using https://github.com/davidmerfield/randomColor
@@ -44,8 +64,7 @@ function checkMatchColor(arrLiElement) {
 
   if (isMatch) {
     //handle change background color
-    const backgroundElement = getColorBackground()
-    backgroundElement.style.backgroundColor = firstColor
+    setBackgroundColor(firstColor)
 
     //check win
     const isWin = getInaciveElementList().length === 0
@@ -54,6 +73,8 @@ function checkMatchColor(arrLiElement) {
       showPlayAgainButton()
       //show YOU WIN
       setTimerText('YOU WIN!!')
+      //clear timer
+      timer.clear()
     }
     selections = []
     return
@@ -86,12 +107,11 @@ function handleResetGame() {
   //clear you win / timeoout text
   setTimerText('30s')
 
-  //reset timer for gameplay
-  attachTimerForGamePlay()
+  //start new game
+  startTimer()
 
   //reset background color
-  const backgroundElement = getColorBackground()
-  backgroundElement.style = ''
+  setBackgroundColor('goldenrod')
 }
 
 function handleClickColor(liElement) {
@@ -127,6 +147,7 @@ function attachEventForPlayAgainButton() {
   playAgainButton.addEventListener('click', handleResetGame)
 }
 
+//handle timer for game play - v1 - not optimize
 function attachTimerForGamePlay() {
   let startTime = GAME_TIME
 
@@ -149,6 +170,10 @@ function attachTimerForGamePlay() {
   }, 1000)
 }
 
+function startTimer() {
+  return timer.start()
+}
+
 ;(function () {
   initColorList()
 
@@ -156,5 +181,6 @@ function attachTimerForGamePlay() {
 
   attachEventForPlayAgainButton()
 
-  attachTimerForGamePlay()
+  // attachTimerForGamePlay()
+  startTimer()
 })()
