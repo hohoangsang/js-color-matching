@@ -1,5 +1,6 @@
-import { GAME_STATUS, PAIRS_COUNT } from './constants.js'
+import { GAME_STATUS, GAME_TIME, PAIRS_COUNT } from './constants.js'
 import {
+  getColorBackground,
   getColorElementList,
   getColorListElement,
   getInaciveElementList,
@@ -42,6 +43,10 @@ function checkMatchColor(arrLiElement) {
   const isMatch = firstColor === secondColor
 
   if (isMatch) {
+    //handle change background color
+    const backgroundElement = getColorBackground()
+    backgroundElement.style.backgroundColor = firstColor
+
     //check win
     const isWin = getInaciveElementList().length === 0
     if (isWin) {
@@ -79,7 +84,14 @@ function handleResetGame() {
   hidePlayAgainButton()
 
   //clear you win / timeoout text
-  setTimerText('')
+  setTimerText('30s')
+
+  //reset timer for gameplay
+  attachTimerForGamePlay()
+
+  //reset background color
+  const backgroundElement = getColorBackground()
+  backgroundElement.style = ''
 }
 
 function handleClickColor(liElement) {
@@ -87,7 +99,7 @@ function handleClickColor(liElement) {
 
   //check li element had been clicked or not
   const isClicked = liElement.classList.contains('active')
-  if (isClicked || selections.length === 2) return
+  if (isClicked || selections.length === 2 || gameStatus === GAME_STATUS.FINISHED) return
 
   liElement.classList.add('active')
 
@@ -115,9 +127,34 @@ function attachEventForPlayAgainButton() {
   playAgainButton.addEventListener('click', handleResetGame)
 }
 
+function attachTimerForGamePlay() {
+  let startTime = GAME_TIME
+
+  const intervalId = setInterval(() => {
+    const fullTimer = `0${startTime}`.slice(-2)
+    setTimerText(`${fullTimer}s`)
+    startTime -= 1
+    const inActiveElementList = getInaciveElementList()
+    if (inActiveElementList.length === 0) {
+      setTimerText('YOU WIN!!')
+      gameStatus = GAME_STATUS.FINISHED
+      clearInterval(intervalId)
+    }
+    if (startTime < 0) {
+      setTimerText('Game Over!')
+      gameStatus = GAME_STATUS.FINISHED
+      showPlayAgainButton()
+      clearInterval(intervalId)
+    }
+  }, 1000)
+}
+
 ;(function () {
   initColorList()
 
   attachEventForColorList()
+
   attachEventForPlayAgainButton()
+
+  attachTimerForGamePlay()
 })()
